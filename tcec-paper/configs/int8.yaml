@@ -1,0 +1,17 @@
+# W8A8: per-channel weights, dynamic activations, rank 16 (paper Sec. 4.1).
+# group [1, -1]: Linear inputs are reshaped to (tokens, channels) before quantization, so each
+# token gets its own dynamic range. Conv inputs get one range per sample.
+quant:
+  wgts:
+    dtype: sint8
+    low_rank:
+      rank: 16
+  ipts:
+    static: false
+    dtype: sint8
+    group_shapes:
+    - - 1
+      - -1
+    allow_unsigned: true
+pipeline:
+  shift_activations: true
