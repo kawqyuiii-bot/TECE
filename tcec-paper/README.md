@@ -47,6 +47,8 @@ Q-Diffusion / SVDQuant  ──μ̃──▶  1. 校准：同一 x_t 上比较量
 
 建议 Python 3.10、CUDA GPU、torch 2.5。不要用 2.6 以上：它默认 `weights_only=True`，旧检查点可能读不出来。
 
+`constraints.txt` 固定了 torch 2.5.1 以及必须与它匹配的库（diffusers、transformers 等）。不要单独升级这些库：新版 diffusers 会调用 torch 2.6 才有的 `torch.accelerator`，导入时就报错。
+
 ```bash
 ./setup.sh
 python tests/test_local.py
