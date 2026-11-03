@@ -22,13 +22,14 @@ def namespace(d):
     return types.SimpleNamespace(**{k: namespace(v) if isinstance(v, dict) else v for k, v in d.items()})
 
 
-def setup(args):
+def setup(args, split=False):
+    """split=True only for a model that QuantModel will wrap: the FP Conv2d shortcut takes no split arg"""
     sys.path.insert(0, os.path.abspath(args.qdiff_root))
     from ddim.models.diffusion import Model
     from ddim.functions.ckpt_util import get_ckpt_path
 
     config = namespace(yaml.safe_load(open(os.path.join(args.qdiff_root, "configs/cifar10.yml"))))
-    config.split_shortcut = True                                     # same as --split
+    config.split_shortcut = split                                    # same as --split
     d = config.diffusion
     betas = torch.tensor(np.linspace(d.beta_start, d.beta_end, d.num_diffusion_timesteps), dtype=torch.float, device=dev)
     model = Model(config)
@@ -96,7 +97,7 @@ def gen_cali(args):
 
 @torch.no_grad()
 def calibrate_k(args):
-    model, betas = setup(args)
+    model, betas = setup(args, split=True)
     sc = schedule(betas, args.steps)
     fp = setup(args)[0]                                              # QuantModel takes over `model`
     qnn = quantized(model, args)
@@ -116,7 +117,7 @@ def calibrate_k(args):
 
 @torch.no_grad()
 def sample(args):
-    model, betas = setup(args)
+    model, betas = setup(args, split=args.mode != "fp")
     sc = schedule(betas, args.steps)
     net = model if args.mode == "fp" else quantized(model, args)
     K = None
