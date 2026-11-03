@@ -7,7 +7,8 @@ get() { [ -d "third_party/$1" ] || { git clone "https://github.com/$2.git" "thir
 get q-diffusion Xiuyu-Li/q-diffusion 715783d
 get guided-diffusion openai/guided-diffusion 22e0df8
 # constraints.txt pins torch 2.5 and the libraries that must match it
-pip install -c constraints.txt torch torchvision einops omegaconf pytorch-lightning torch-fidelity pyyaml diffusers transformers huggingface_hub accelerate torchmetrics
+pip install -c constraints.txt torch torchvision einops omegaconf pytorch-lightning torch-fidelity pyyaml diffusers transformers huggingface_hub accelerate torchmetrics \
+  lmdb pandas six requests tqdm                                 # imported by q-diffusion
 [ -d .venv-adm ] || python -m venv .venv-adm                     # sFID evaluator, TensorFlow on CPU
 .venv-adm/bin/pip install tensorflow-cpu "scipy<1.14" requests tqdm
 if [ "${1:-}" = "sdxl" ]; then
